@@ -1,0 +1,9 @@
+PayPal:
+
+Sandbox account: sb-s43nyx4815538@business.example.com
+Client ID: AWE1gNgf4gdS5AScMMtxfXYTYs2BFMXtfhLt5oQRVrQmgvaU8Spic-qjFuG9sF33k6jyaKdzDAmd9Ale
+Secret: EJJ7-ouDUxNxsE-clu64qS00TBBjoorl3ofUTzkXAHPLcxbI4jYkcmg6D6i3VHGrlgoi0DaU9d41x8B1
+
+sb-rkjlt10966820@business.example.com
+E.,3uCA<
+
