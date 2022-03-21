@@ -8,7 +8,8 @@ use App\Models\Order;
 use App\Http\Controllers\Front\PaypalController;
 use App\Http\Controllers\Front\StripeController;
 use App\Http\Controllers\Front\SofortController;
-
+use Config;
+use Stripe;
 
 class checkOutController extends Controller
 {
@@ -72,6 +73,7 @@ class checkOutController extends Controller
             'street' => 'required',
             'number' => 'required',
             'zip_code' => 'required',
+            'total_price' => 'required',
             'same_address' => '',
             'same_parking' => '',
             'save_info' => '',
@@ -109,23 +111,48 @@ class checkOutController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required',
-            'total_price' => 'required',
             'phone' => '',
             'payment' => '',
             'order_id' => 'required',
         ]);
+        
         $order = $request->session()->get('order');
         $order->fill($validatedData);
         $request->session()->put('order', $order);
         if($order->payment == 'PayPal'){
             $paypal = new PayPalController();
             return $paypal->bookingProcess($request);
-        } elseif($order->payment == 'Credit Card (Stripe)') {
+        } else {
             $stripe = new StripeController();
             return $stripe->bookingProcess($request);
-        } else {
-            $sofort = new SofortController();
-            return $sofort->bookingProcess($request);
+        }
+    }
+    public function test(Request $request){
+        dd($request->all());
+    }
+
+    public function stripe_credit(Request $request){
+        try {
+            $total = $request->session()->get('order')->total_price * 100;
+            \Stripe\Stripe::setApiKey(Config::get('services.stripe.secret'));
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => $total,
+                'currency' => 'eur',
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                ],
+            ]);
+            
+            $output = [
+                'clientSecret' => $paymentIntent->client_secret,
+            ];
+            $order = $request->session()->get('order');
+            $order->fill(['transaction_id' => $output['clientSecret']]);
+            $request->session()->put('order', $order);
+            echo json_encode($output);
+        } catch (Error $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
         }
     }
 }

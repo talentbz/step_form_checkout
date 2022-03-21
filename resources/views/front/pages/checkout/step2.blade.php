@@ -68,6 +68,7 @@
         <h4 class="mb-3">Address of the no-parking zone</h4>
         <form class="needs-validation" action="{{route('front.checkout_post_2')}}" method="POST" novalidate>
           @csrf
+          <input type="hidden" name="total_price" value="{{$price + $order->length + $order->duration}}">
           <div class="row g-3">
             <div class="col-8">
               <label for="address" class="form-label">Street</label>

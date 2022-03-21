@@ -27,13 +27,15 @@ Route::post('/checkout_post_1', [App\Http\Controllers\Front\checkOutController::
 Route::get('/checkout_2', [App\Http\Controllers\Front\checkOutController::class, 'checkout_2'])->name('front.checkout_2');
 Route::post('/checkout_post_2', [App\Http\Controllers\Front\checkOutController::class, 'checkout_post_2'])->name('front.checkout_post_2');
 Route::get('/checkout_3', [App\Http\Controllers\Front\checkOutController::class, 'checkout_3'])->name('front.checkout_3');
-Route::post('/checkout_post_3', [App\Http\Controllers\Front\checkOutController::class, 'checkout_post_3'])->name('front.checkout_post_3');
+Route::any('/checkout_post_3', [App\Http\Controllers\Front\checkOutController::class, 'checkout_post_3'])->name('front.checkout_post_3');
 Route::get('/checkout_4', [App\Http\Controllers\Front\checkOutController::class, 'checkout_4'])->name('front.checkout_4');
+
+Route::get('/test', [App\Http\Controllers\Front\checkOutController::class, 'test'])->name('front.test');
 
 Route::get('/paypal/notify', [App\Http\Controllers\Front\PaypalController::class, 'paymentNotify'])->name('notify.paypal');
 Route::get('/cancel-payment', [App\Http\Controllers\Front\PaypalController::class, 'paymentCancel'])->name('cancel.paypal');
 Route::get('/payment/success', [App\Http\Controllers\Front\PaypalController::class, 'paymentSuccess'])->name('success.payment');
-
+Route::post('/stripe_credit', [App\Http\Controllers\Front\checkOutController::class, 'stripe_credit'])->name('front.stripe_credit');
 Route::prefix('/admin')->middleware('auth:web')->group(function () {
     Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
     Route::get('/order', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.order');

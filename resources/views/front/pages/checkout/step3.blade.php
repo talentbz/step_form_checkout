@@ -19,6 +19,9 @@
 
     
 <link href="{{ URL::asset('/assets/front/form-validation.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('/assets/front/css/stripe.css') }}" rel="stylesheet" type="text/css" />
+<script src="https://js.stripe.com/v3/"></script>
+
 @endsection
 @section('content')
 <div class="container mt-5">
@@ -62,8 +65,7 @@
             <strong>{{number_format(($price + $order->length + $order->duration), 2, ',', '')}} €</strong>
         </ul>
 
-       <p style="text-align: center; font-size: 0.6rem;">For the permit, the authority will charge you directly 27€ fees.
-      </p>
+       <p style="text-align: center; font-size: 0.6rem;">For the permit, the authority will charge you directly 27€ fees.</p>
 
       </div>
       <div class="col-md-7 col-lg-8">
@@ -72,7 +74,6 @@
           @csrf
           <div class="row g-3">
             <input type="hidden" name="order_id" value="{{time()}}">
-            <input type="hidden" name="total_price" value="{{$price + $order->length + $order->duration}}">
             <div class="col-12">
               <label for="address" class="form-label">Company name (optional)</label>
               <input type="text" class="form-control" id="company" placeholder="" name="company" required>
@@ -115,64 +116,6 @@
             </div>
 
           <hr class="my-4">
-
-          <h4 class="mb-3">Payment</h4>
-
-          <div class="my-3">
-            <div class="form-check">
-              <input id="credit" name="payment" type="radio" class="form-check-input" checked  value="PayPal" required>
-              <label class="form-check-label" for="credit">PayPal</label>
-            </div>
-            <div class="form-check">
-              <input id="d_stripe" name="payment" type="radio" class="form-check-input" value="Credit Card (Stripe)" required>
-              <label class="form-check-label" for="d_stripe">Credit Card (Stripe)</label>
-            </div>
-            <div class="row d-none" id="tab-stripe">
-              <div class="col-12">
-                  <div class="field-input">
-                      <input type="text" class="form-control mb-1" name="cardNumber" placeholder="Card Number" autocomplete="off" value="{{old('cardNumber')}}"/>
-                  </div>
-                  @error('cardNumber')
-                  <p class="text-danger">{{convertUtf8($message)}}</p>
-                  @enderror
-                  <span id="errCard" class="text-danger mb-1"></span>
-              </div>
-              <div class="col-12">
-                  <div class="field-input">
-                      <input type="text" class="form-control mb-1" placeholder="CVC" name="cardCVC" value="{{old('cardCVC')}}">
-                  </div>
-                  @error('cardCVC')
-                  <p class="text-danger">{{convertUtf8($message)}}</p>
-                  @enderror
-                  <span id="errCVC text-danger mb-1"></span>
-              </div>
-              <div class="col-12">
-                  <div class="field-input">
-                      <input type="text" class="form-control mb-1" placeholder="Month" name="month" value="{{old('month')}}">
-                  </div>
-                  @error('month')
-                  <p class="text-danger">{{convertUtf8($message)}}</p>
-                  @enderror
-              </div>
-              <div class="col-12 mb-4">
-                  <div class="field-input">
-                      <input type="text" class="form-control mb-0" placeholder="Year" name="year" value="{{old('year')}}">
-                  </div>
-                  @error('year')
-                  <p class="text-danger">{{convertUtf8($message)}}</p>
-                  @enderror
-              </div>
-            </div>
-            <div class="form-check">
-              <input id="s_stripe" name="payment" type="radio" class="form-check-input" value="SOFORT (Stripe)">
-              <label class="form-check-label" for="s_stripe">SOFORT (Stripe)</label>
-            </div>
-        </div>
-
-
-
-          <hr class="my-4">
-
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="same-address">
             <label class="form-check-label" for="same-address">I accept the terms and conditions</label>
@@ -183,15 +126,42 @@
             <label class="form-check-label" for="save-info">I am aware that my order is non-refundable.</label>
           </div>
           <hr class="my-4">
+          <h4 class="mb-3">Payment</h4>
 
-          <button class="w-100 btn btn-primary btn-lg" type="submit">Order now</button>
+          <div class="my-3">
+            <div class="form-check">
+              <input id="credit" name="payment" type="radio" class="form-check-input" checked  value="PayPal" required>
+              <label class="form-check-label" for="credit">PayPal</label>
+            </div>
+            <div class="form-check">
+              <input id="d_stripe" name="payment" type="radio" class="form-check-input" value="Credit Card (Stripe)" required>
+              <label class="form-check-label" for="d_stripe">Stripe</label>
+            </div>
+          </div>
+          <button class="w-100 btn btn-primary btn-lg" type="submit" id="order-confirm">Order now</button>
+        </form>
+        <form id="payment-form" class="col-12">
+          <div id="payment-element">
+              <!--Stripe.js injects the Payment Element-->
+          </div>
+          <button id="submit">
+              <div class="spinner hidden" id="spinner"></div>
+              <span id="button-text">Pay now</span>
+          </button>
+          <div id="payment-message" class="hidden"></div>
         </form>
       </div>
     </div>
 </div>
 @endsection
 @section('script')
+<script>
+  stripe_url = "{{route('front.stripe_credit')}}";
+  complete_url = "{{route('success.payment')}}"
+  checkout_post = "{{route('front.checkout_post_3')}}"
+</script>
 <script src="{{ URL::asset('assets/libs/jquery/jquery.min.js')}}"></script>
 <script src="{{ URL::asset('/assets/front/form-validation.js') }}"></script>
 <script src="{{ URL::asset('/assets/front/js/payment.js')}}"></script>
+<script src="{{ URL::asset('/assets/front/js/stripe.js')}}"></script>
 @endsection
